@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
     spec.name          = "audio"
-    spec.version       = '0'
+    spec.version       = '0.1'
     spec.authors       = ["Brandon Fosdick"]
     spec.email         = ["bfoz@bfoz.net"]
     spec.summary       = %q{Cross-platform Audio Device Input and Output}
