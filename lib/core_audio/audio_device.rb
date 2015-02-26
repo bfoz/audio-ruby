@@ -36,6 +36,28 @@ module CoreAudio
     # @endgroup
 
     class AudioDevice < AudioObject
+	# @group AudioHardwareBase.h: AudioDevice Properties
+	PropertyConfigurationApplication        = 'capp'
+	PropertyDeviceUID                       = 'uid '
+	PropertyModelUID                        = 'muid'
+	PropertyTransportType                   = 'tran'
+	PropertyRelatedDevices                  = 'akin'
+	PropertyClockDomain                     = 'clkd'
+	PropertyDeviceIsAlive                   = 'livn'
+	PropertyDeviceIsRunning                 = 'goin'
+	PropertyDeviceCanBeDefaultDevice        = 'dflt'
+	PropertyDeviceCanBeDefaultSystemDevice  = 'sflt'
+	PropertyLatency                         = 'ltnc'
+	PropertyStreams                         = 'stm#'
+	PropertyControlList                     = 'ctrl'
+	PropertySafetyOffset                    = 'saft'
+	PropertyNominalSampleRate               = 'nsrt'
+	PropertyAvailableNominalSampleRates     = 'nsr#'
+	PropertyIcon                            = 'icon'
+	PropertyIsHidden                        = 'hidn'
+	PropertyPreferredChannelsForStereo      = 'dch2'
+	PropertyPreferredChannelLayout          = 'srnd'
+	# @endgroup
 
 	# @group AudioHardware.h: AudioDevice Properties
 	PropertyPlugIn                          = 'plug'
@@ -54,20 +76,56 @@ module CoreAudio
 	# @endgroup
 
 	# @group Properties
-	def actual_sample_rate
-	    address = PropertyAddress.global_master(PropertyActualSampleRate)
-	    get_property(address).get_float64(0)
-	end
 
 	def buffer_frame_size
 	    address = PropertyAddress.global_master(PropertyBufferFrameSize)
 	    get_property(address).get_uint32(0)
 	end
 
+	# @return [Bool]    true if the device is running
+	def running?
+	    address = PropertyAddress.global_master(PropertyDeviceIsRunning)
+	    0 != get_property(address).get_uint32(0)
+	end
+
 	def running_somewhere?
 	    address = PropertyAddress.global_master(PropertyDeviceIsRunningSomewhere)
 	    0 != get_property(address).get_uint32(0)
 	end
+
+	# @group Sample Rate
+
+	# @return [Float]   the measured sample rate in Hertz
+	def actual_sample_rate
+	    address = PropertyAddress.global_master(PropertyActualSampleRate)
+	    get_property(address).get_float64(0)
+	end
+
+	# @return [Array<Number,Range>]	the available sampling rates, or sample-rate-ranges
+	def available_sample_rates
+	    address = PropertyAddress.global_master(PropertyAvailableNominalSampleRates)
+	    buffer = get_property(address)
+	    buffer = buffer.get_array_of_float64(0, buffer.size / FFI::Type::DOUBLE.size)
+
+	    # Convert the range pairs into actual Ranges, unless the Range is empty
+	    buffer.each_slice(2).map {|a,b| (a==b) ? a : (a..b)}
+	end
+
+	# @return [Float]   the device's nominal sample rate
+	def sample_rate
+	    address = PropertyAddress.global_master(PropertyNominalSampleRate)
+	    get_property(address).get_float64(0)
+	end
+
+	# @param rate [Float]	the new sample rate in Hertz
+	def sample_rate=(rate)
+	    address = PropertyAddress.global_master(PropertyNominalSampleRate)
+	    ffi_rate = FFI::MemoryPointer.new(:double)
+	    ffi_rate.put_float64(0, rate)
+	    status = set_property(address, ffi_rate)
+	    raise "status #{status} => '#{[status].pack('L').reverse}'" unless 0 == status
+	end
+	# @endgroup
 	# @endgroup
 
 	# Start the AudioDevice

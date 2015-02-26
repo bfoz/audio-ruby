@@ -28,7 +28,7 @@ end
 require_relative 'core_audio/audio_device'
 
 module CoreAudio
-    # AudioHardware.h
+    # @group AudioHardware.h
     # OSStatus AudioObjectGetPropertyDataSize(AudioObjectID			inObjectID,
     #					      const AudioObjectPropertyAddress* inAddress,
     #					      UInt32                            inQualifierDataSize,
@@ -43,6 +43,15 @@ module CoreAudio
     #					  UInt32*                           ioDataSize,
     #					  void*                             outData)
     attach_function :AudioObjectGetPropertyData, [AudioObject::ObjectID, AudioObject::PropertyAddress.by_ref, :uint32, :pointer, :pointer, :pointer], :OSStatus
+
+    # OSStatus AudioObjectSetPropertyData(AudioObjectID                       inObjectID,
+    #					  const AudioObjectPropertyAddress*   inAddress,
+    #					  UInt32                              inQualifierDataSize,
+    #					  const void*                         inQualifierData,
+    #					  UInt32                              inDataSize,
+    #					  const void*                         inData)
+    attach_function :AudioObjectSetPropertyData, [AudioObject::ObjectID, AudioObject::PropertyAddress.by_ref, :uint32, :pointer, :uint32, :pointer], :OSStatus
+    # @endgroup
 
     # @return [Array<AudioObject>]  the list of available audio devices
     def self.devices

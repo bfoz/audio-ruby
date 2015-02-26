@@ -51,21 +51,6 @@ module CoreAudio
 	PropertyUserSessionIsActiveOrHeadless       = 'user'
 	PropertyServiceRestarted                    = 'srst'
 	PropertyPowerHint                           = 'powh'
-
-	# AudioHardware.h: AudioDevice Properties
-	AudioDevicePropertyPlugIn                          = 'plug'
-	AudioDevicePropertyDeviceHasChanged                = 'diff'
-	AudioDevicePropertyDeviceIsRunningSomewhere        = 'gone'
-	AudioDeviceProcessorOverload                       = 'over'
-	AudioDevicePropertyIOStoppedAbnormally             = 'stpd'
-	AudioDevicePropertyHogMode                         = 'oink'
-	AudioDevicePropertyBufferFrameSize                 = 'fsiz'
-	AudioDevicePropertyBufferFrameSizeRange            = 'fsz#'
-	AudioDevicePropertyUsesVariableBufferFrameSizes    = 'vfsz'
-	AudioDevicePropertyIOCycleUsage                    = 'ncyc'
-	AudioDevicePropertyStreamConfiguration             = 'slay'
-	AudioDevicePropertyIOProcStreamUsage               = 'suse'
-	AudioDevicePropertyActualSampleRate                = 'asrt'
     end
 
     class AudioObject
@@ -121,6 +106,11 @@ module CoreAudio
 	    raise('Could not get the audio property data') unless 0 == status
 
 	    buffer
+	end
+
+	def set_property(address, buffer, qualifier=nil)
+	    qualifier_size = qualifier.size rescue 0
+	    CoreAudio.AudioObjectSetPropertyData(id, address, 0, nil, buffer.size, buffer)
 	end
 
 	# @group Convenience Attributes
