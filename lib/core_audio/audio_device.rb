@@ -35,6 +35,7 @@ module CoreAudio
 
     # @endgroup
 
+    # Split the constants so that AudioStream can see 'PropertyLatency'
     class AudioDevice < AudioObject
 	# @group AudioHardwareBase.h: AudioDevice Properties
 	PropertyConfigurationApplication        = 'capp'
@@ -58,7 +59,11 @@ module CoreAudio
 	PropertyPreferredChannelsForStereo      = 'dch2'
 	PropertyPreferredChannelLayout          = 'srnd'
 	# @endgroup
+    end
 
+    require_relative 'audio_stream'
+
+    class AudioDevice
 	# @group AudioHardware.h: AudioDevice Properties
 	PropertyPlugIn                          = 'plug'
 	PropertyDeviceHasChanged                = 'diff'
@@ -91,6 +96,13 @@ module CoreAudio
 	def running_somewhere?
 	    address = PropertyAddress.global_master(PropertyDeviceIsRunningSomewhere)
 	    0 != get_property(address).get_uint32(0)
+	end
+
+	# @return [Array<AudioStream>]	an array of {AudioStream}s, one for each stream provided by the device
+	def streams
+	    address = PropertyAddress.global_master(PropertyStreams)
+	    buffer = get_property(address)
+	    buffer.get_array_of_uint32(0, buffer.size/FFI::Type::UINT32.size).map {|stream_id| AudioStream.new(stream_id)}
 	end
 
 	# @group Sample Rate
