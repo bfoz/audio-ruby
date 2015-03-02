@@ -48,6 +48,11 @@ module CoreAudio
 	    [self[:mBuffers]]
 	end
 
+	# @return [String]  the raw bytes
+	def bytes
+	    buffers.map(&:bytes).join
+	end
+
 	# @return [Number]  the total number of bytes in the buffer list
 	def bytesize
 	    buffers.map(&:bytesize).reduce(&:+)
