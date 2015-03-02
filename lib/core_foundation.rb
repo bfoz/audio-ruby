@@ -6,6 +6,8 @@ module CoreFoundation
 
     typedef :pointer, :CFStringRef
 
+    OSStatus = typedef :uint32, :OSStatus
+
     if FFI::Platform::ARCH == 'x86_64'
 	CFIndex = FFI::Type::LONG_LONG
     else

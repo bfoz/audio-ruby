@@ -17,6 +17,10 @@ module CoreAudio
 	    self[:mData].get_bytes(0, self[:mDataByteSize])
 	end
 
+	def bytesize
+	    self[:mDataByteSize]
+	end
+
 	# @return [Array<Integer>]  an array of samples, converted to signed integers
 	def samples_int(bytes_per_channel)
 	    self[:mData].get_array_of_int16(0, self[:mDataByteSize]/bytes_per_channel)
@@ -32,10 +36,28 @@ module CoreAudio
 	layout :mNumberBuffers, :uint32,
 	       :mBuffers, AudioBuffer
 
+	def self.buffer_list(channels:1, size:nil)
+	    self.new.tap do |list|
+		list[:mNumberBuffers] = 1
+		list[:mBuffers][:mNumberChannels] = channels
+
+		if( size )
+		    list[:mBuffers][:mData] = FFI::MemoryPointer.new(size)
+		    list[:mBuffers][:mDataByteSize] = size
+		else
+		    list[:mBuffers][:mDataByteSize] = 0
+		end
+	    end
+	end
+
 	# @return [Array]   the buffers
 	def buffers
 	    raise("Can't handle multiple buffers yet") if self[:mNumberBuffers] > 1
 	    [self[:mBuffers]]
+	end
+
+	def bytesize
+	    buffers.map(&:bytesize).reduce(&:+)
 	end
 
 	# Retrieve the samples as an {Array}, after converting to the requested type
