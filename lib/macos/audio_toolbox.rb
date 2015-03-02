@@ -1,9 +1,8 @@
 require 'ffi'
 
-require_relative '../core_foundation'
-require_relative '../core_audio/audio_stream'
-
 require_relative 'audio_toolbox/audio_converter'
+require_relative 'core_foundation'
+require_relative 'core_audio/audio_stream'
 
 module AudioToolbox
     extend FFI::Library

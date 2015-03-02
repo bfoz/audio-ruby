@@ -1,4 +1,4 @@
-require_relative 'core_audio'
+require_relative 'macos/core_audio'
 require_relative 'macos/audio_toolbox'
 
 module Audio

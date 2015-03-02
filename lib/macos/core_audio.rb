@@ -1,6 +1,6 @@
 require 'ffi'
 
-require_relative 'macos/core_audio/audio_types'
+require_relative 'core_audio/audio_types'
 
 module CoreAudio
     extend FFI::Library
