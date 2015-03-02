@@ -13,33 +13,17 @@ module AudioToolbox
 	    num_from_packets = (buffer.bytesize / from[:mBytesPerPacket]).floor
 	    remaining_packets = num_from_packets
 
-	    # Keep track of the head of the buffer
-	    data_pointer = buffer.buffers.first[:mData]
-
 	    block = Proc.new do |_, num_packets, buffer_list, _|
-		required_packets = num_packets.get_uint32(0)
-		buffer_list = CoreAudio::AudioBufferList.new(buffer_list)
-
-		if required_packets >= remaining_packets
-		    buffer_list.buffers.first[:mData] = data_pointer
+		unless remaining_packets.zero?
+		    buffer_list = CoreAudio::AudioBufferList.new(buffer_list)
+		    buffer_list.buffers.first[:mData] = buffer.buffers.first[:mData]
 		    buffer_list.buffers.first[:mDataByteSize] = buffer.buffers.first[:mDataByteSize]
-
-		    # Report the number of packets actually sent
-		    num_packets.put_uint32(0, remaining_packets)
-
-		    remaining_packets = 0   # No more packets remaining
-		else
-		    byte_size = from[:mBytesPerPacket] * required_packets
-		    buffer_list.buffers.first[:mData] = data_pointer
-		    buffer_list.buffers.first[:mDataByteSize] = byte_size
-
-		    # Report the number of packets actually sent
-		    num_packets.put_uint32(0, required_packets)
-
-		    data_pointer += byte_size   # Advance the buffer pointer by the number of bytes actually sent
-
-		    remaining_packets -= required_packets
 		end
+
+		# Report the number of packets actually sent
+		num_packets.put_uint32(0, remaining_packets)
+
+		remaining_packets = 0   # No more packets remaining
 
 		0   # All is well
 	    end
