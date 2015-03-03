@@ -44,4 +44,18 @@ module CoreAudio
 	device_IDs = buffer.get_array_of_int32(0, buffer.size/4)
 	device_IDs.map {|id| AudioDevice.new(id)}
     end
+
+    # @return [AudioDevice] the default input device
+    def self.default_input
+	address = AudioObject::PropertyAddress.global_master(AudioHardware::PropertyDefaultInputDevice)
+	buffer = AudioObject.system.get_property(address)
+	AudioDevice.new(buffer.get_uint32(0))
+    end
+
+    # @return [AudioDevice] the default output device
+    def self.default_output
+	address = AudioObject::PropertyAddress.global_master(AudioHardware::PropertyDefaultOutputDevice)
+	buffer = AudioObject.system.get_property(address)
+	AudioDevice.new(buffer.get_uint32(0))
+    end
 end

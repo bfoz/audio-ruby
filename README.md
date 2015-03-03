@@ -40,6 +40,15 @@ Device Name: Built-in Output
 Device Name: Blue Snowball
 ```
 
+### Using the default Audio Devices
+
+If you just want to use a default device, Audio has you covered.
+
+```ruby
+Audio.default_input     # => Device Name: Built-in Microphone
+Audio.default_output    # => Device Name: Built-in Output
+```
+
 ### Recording Audio
 
 You can record audio from a particular device by calling its `start` method.
@@ -48,8 +57,7 @@ called. If you provide a block parameter to `start`, it will be called whenever
 the host OS provides a new buffer of audio samples.
 
 ```ruby
-device = Audio.devices.last     # Hopefully that's an input device
-device.start do |*args|
+Audio.default_input.start do |*args|
     # Do something fancy
 end
 
